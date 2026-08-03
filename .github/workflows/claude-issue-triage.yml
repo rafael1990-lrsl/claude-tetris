@@ -43,5 +43,7 @@ jobs:
                - Causa probable / análisis técnico.
                - Archivos del repo probablemente involucrados (game.js, index.html, style.css u otros).
                - Enfoque de alto nivel sugerido para abordarlo (sin implementar código todavía).
+               El comentario debe estar escrito en formato Markdown compatible con GitHub (encabezados,
+               listas, bloques de código con ``` y demás sintaxis que GitHub renderiza correctamente).
                No implementes la solución ni modifiques archivos del repositorio: esto es solo diagnóstico
                para guiar el trabajo de implementación posterior.
