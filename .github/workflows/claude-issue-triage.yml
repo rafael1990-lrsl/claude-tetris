@@ -1,0 +1,47 @@
+name: Claude Issue Triage
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Issue Triage
+        id: claude-triage
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: '--allowed-tools "Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(gh issue view:*),Bash(gh label list:*)"'
+          prompt: |
+            Analiza el issue #${{ github.event.issue.number }} del repositorio ${{ github.repository }}.
+
+            Contexto del proyecto: es un juego de Tetris en JavaScript vanilla (game.js contiene toda
+            la lógica del juego, index.html el DOM/canvas, style.css los estilos). No hay build ni tests.
+
+            Pasos:
+            1. Lee el issue con `gh issue view ${{ github.event.issue.number }}` para obtener título y
+               cuerpo actualizados.
+            2. Elige las labels apropiadas ÚNICAMENTE de esta lista existente en el repo (no crees labels
+               nuevas): bug, documentation, duplicate, enhancement, good first issue, help wanted,
+               invalid, question, wontfix.
+               Aplícalas con `gh issue edit ${{ github.event.issue.number }} --add-label "<label>"`.
+               Si el issue ya tiene labels que ya no aplican, puedes quitarlas con `--remove-label`.
+            3. Publica un comentario en el issue (`gh issue comment ${{ github.event.issue.number }} --body "..."`)
+               con un diagnóstico general, en español, que incluya:
+               - Resumen del problema en 1-2 frases.
+               - Causa probable / análisis técnico.
+               - Archivos del repo probablemente involucrados (game.js, index.html, style.css u otros).
+               - Enfoque de alto nivel sugerido para abordarlo (sin implementar código todavía).
+               No implementes la solución ni modifiques archivos del repositorio: esto es solo diagnóstico
+               para guiar el trabajo de implementación posterior.
